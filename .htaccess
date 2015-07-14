@@ -1,0 +1,4 @@
+RewriteEngine on
+
+# All forward the request to the directory static
+RewriteRule ^(.*)$ static/$1 [L]
