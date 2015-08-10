@@ -57,6 +57,33 @@ class Request {
     }
 
     /**
+     * 是否为GET请求
+     *
+     * @return bool
+     */
+    public function isGet() {
+        return 'get' === $this->getRequestMethod();
+    }
+
+    /**
+     * 是否为POST请求
+     *
+     * @return bool
+     */
+    public function isPost() {
+        return 'post' === $this->getRequestMethod();
+    }
+
+    /**
+     * 获取HTTP请求方式
+     *
+     * @return string
+     */
+    public function getRequestMethod() {
+        return strtolower($_SERVER['REQUEST_METHOD']);
+    }
+
+    /**
      * 获取get数据
      * 如果没有参数，则表示获取整个get数组数据
      * 如果有第一个参数，该参数则作为get数组中相应key，并返回对应的get数组的值

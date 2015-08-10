@@ -8,5 +8,7 @@
   </head>
   <body>
     <?php echo $body;?>
+
+  <script type="text/javascript" src="/js/test.js"></script>
   </body>
 </html>

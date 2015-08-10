@@ -23,14 +23,6 @@ mb_http_output('UTF-8');
 
 /*
 |--------------------------------------------------------------------------
-| Setting default content-type
-|--------------------------------------------------------------------------
-*/
-
-header("Content-type: text/html; charset=utf-8");
-
-/*
-|--------------------------------------------------------------------------
 | Load bootstrap files
 |--------------------------------------------------------------------------
 */
@@ -44,7 +36,20 @@ $router = require __DIR__.'/../bootstrap/start.php';
 */
 
 try {
-    $router->route();
+    $entity = $router->route();
+    switch (true) {
+        case $entity instanceof \Caylof\Mvc\Controller:
+            $entity->response->header();
+            echo $entity->response->content;
+            break;
+        case $entity instanceof \Caylof\Response:
+            $entity->header();
+            echo $entity->content;
+            break;
+        default:
+            header("Content-type: text/html; charset=utf-8");
+            echo $entity;
+    }
 } catch (\Caylof\Exception\NotFound $e) {
     header("HTTP/1.1 404 Not Found");
     header("Status: 404 Not Found");

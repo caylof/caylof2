@@ -2,21 +2,17 @@
 namespace App\Controllers\Test;
 
 use \Caylof\Mvc\Controller,
-    \Caylof\Mvc\View,
-    \App\Models\UserModel;
+    \Caylof\Mvc\View;
 
 class IndexController extends Controller {
 
-    protected function init() {
-
-    }
-
     public function index() {
-        $request = $this->getRequest();
-        $page = $request->get('p', 1);
-        //echo '<h1>Hello Caylof</h1>';
-        //echo '<p>Page: '.$page.'</p>';
-        $this->redirect('/other');
+        $page = $this->request->get('p', 1);
+        $res = '<h1>Hello Caylof</h1>';
+        $res .= '<p>Page: '.$page.'</p>';
+
+        $this->response->content = $res;
+        return $this;
     }
 
     public function other() {
@@ -25,22 +21,19 @@ class IndexController extends Controller {
             'title' => '测试',
             'body' => '测试测试'
         ));
-        $view->output();
+
+        $this->response->content = $view->render();
+        return $this;
         //$this->redirect('/');
     }
 
-    public function listUser($id = 0) {
-        $userId = (int)$id;
+    public function listUser($userId) {
+        //$this->response->type = 'json';
+        $this->response->content = json_encode([
+            'id' => $userId,
+            'name' => '中国人'
+        ], JSON_UNESCAPED_UNICODE);
 
-        $user = new UserModel();
-        //$flag = $user->find($userId);
-        $flag = $user->where('id', '=', $userId)->get();
-
-        if ($flag) {
-            echo '<p>User Id: '.$user->getId().'</p>';
-            echo '<p>User Name: '.$user->getName().'</p>';
-        } else {
-            echo 'User not found';
-        }
+        return $this->response;
     }
 }

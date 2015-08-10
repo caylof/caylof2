@@ -16,4 +16,5 @@ $loader = require __DIR__.'/../vendor/autoload.php';
 */
 
 $loader->addNamespace('App\Controllers', __DIR__.'/controllers')
-       ->addNamespace('App\Models', __DIR__.'/models');
+       ->addNamespace('App\Models', __DIR__.'/models')
+       ->addNamespace('App\Services', __DIR__.'/services');

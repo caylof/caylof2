@@ -1,50 +1,68 @@
 <?php
 namespace Caylof\Mvc;
 
+use \Caylof\Component;
+use \Caylof\Request;
+use \Caylof\Response;
+
 /**
  * 控制器基类
  *
  * @package Caylof\Mvc
  * @author caylof
  */
-abstract class Controller {
-
-    /**
-     * 依赖
-     *
-     * var \Caylof\DI
-     */
-    protected $di;
+class Controller {
 
     /**
      * 构造函数
+     *
      */
     public function __construct() {
-        $this->init();
+        $this->di = new Component();
+        $this->di->request = function() {
+            return new Request();
+        };
+        $this->di->response = function() {
+            return new Response();
+        };
     }
 
     /**
-     * 初始化
-     * 子类实现该方法来对应用控制器进行初始化设置
-     */
-    abstract protected function init();
-
-    /**
-     * 注入依赖类
+     * 获取Request对象
      *
-     * @param \Caylof\DI $di 
-     */
-    public function setDI(\Caylof\DI $di) {
-        $this->di = $di;
-    }
-
-    /**
-     * 获取request
-     *
-     * @return \Caylof\Request
+     * @return Request
      */
     public function getRequest() {
-        return $this->di->get('request');
+        static $request;
+        return $request ?: $request = $this->di->request;
+    }
+
+    /**
+     * 获取Response对象
+     *
+     * @return Response
+     */
+    public function getResponse() {
+        static $response;
+        return $response ?: $response = $this->di->response;
+    }
+
+    /**
+     * 获取Request对象和Response对象的隐式__get方法
+     */
+    public function __get($prop) {
+        $val = null;
+        switch ($prop) {
+            case 'request':
+                $val = $this->getRequest();
+                break;
+            case 'response':
+                $val = $this->getResponse();
+                break;
+            default:
+                throw new \Exception(sprintf('Property %s is not exist in %s', $prop, __CLASS__));
+        }
+        return $val;
     }
 
     /**
@@ -63,7 +81,7 @@ abstract class Controller {
             $url = array_map('trim', $url);
             $url = join('/', $url);
         }
-        $url = './'.trim($url, '/');
+        $url = '/'.trim($url, '/');
         $url .= $query && $_SERVER['QUERY_STRING'] ? '?'.$_SERVER['QUERY_STRING'] : '';
         header('Location: ' . $url);
     }

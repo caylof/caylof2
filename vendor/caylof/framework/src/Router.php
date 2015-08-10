@@ -9,13 +9,7 @@ namespace Caylof;
  */
 class Router {
 
-    /**
-     * 本类实例对象
-     *
-     * @access private
-     * @var \Caylof\Router 存储本类的一个实例，以实现单例模式
-     */
-    private static $instance;
+    use Traits\Singleton;
 
     /**
      * 路由存储列表
@@ -24,25 +18,6 @@ class Router {
      * @var array
      */
     private $routerList;
-
-    /**
-     * 本类不允许被外界实例化，以实现单例模式
-     */
-    private function __construct() {
-        
-    }
-
-    /**
-     * 获取本类的一个实例
-     *
-     * @return \Caylof\Router
-     */
-    public static function getInstance() {
-        if (!(static::$instance instanceof static)) {
-            static::$instance = new static;
-        }
-        return static::$instance;
-    }
 
     /**
      * 添加路由请求
@@ -99,8 +74,7 @@ class Router {
      * 将“请求”分解到相应“路由”
      */
     public function route() {
-        $path   = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
-        $uri    = parse_url($path);
+        $uri    = parse_url($_SERVER['REQUEST_URI']);
         $uri    = '/'.trim($uri['path'], '/ ');
         $uri    = urldecode($uri);
         $type   = strtoupper($_SERVER['REQUEST_METHOD']);
@@ -109,7 +83,8 @@ class Router {
         $router = $ret['router'];
         $params = $ret['params'];
         $todo   = $router['todo'];
-        $this->dispatch($todo, $params);
+
+        return $this->dispatch($todo, $params);
     }
 
     /**
@@ -139,7 +114,7 @@ class Router {
      */
     public function dispatch($todo, array $params) {
         if ($todo instanceof \Closure) {
-            call_user_func_array($todo, $params);
+            $res = call_user_func_array($todo, $params);
         } else {
             $splits     = explode('@', $todo);
             $className  = array_shift($splits);
@@ -156,15 +131,15 @@ class Router {
             }
 
             $contro = $rc->newInstance();
-            $contro->setDI(DI::getInstance());
             $method = $rc->getMethod($methodName);
 
             if (count($params)) {
-                $method->invokeArgs($contro, $params);
+                $res = $method->invokeArgs($contro, $params);
             } else {
-                $method->invoke($contro);
+                $res = $method->invoke($contro);
             }
         }
+        return $res;
     }
 
     /**
@@ -175,12 +150,5 @@ class Router {
         if (is_string($todo) && (strpos($todo, '@') === false)) {
             throw new Exception\UnexpectedValue('"'.$todo.'"'." expect have \'@\' to split controller and method, but not have");
         }
-    }
-
-    /**
-     * 本类不允许克隆，用于实现单例模式
-     */
-    private function __clone() {
-        
     }
 }
