@@ -1,8 +1,9 @@
 <?php
 namespace App\Controllers\Test;
 
-use \Caylof\Mvc\Controller,
-    \Caylof\Mvc\View;
+use Caylof\Mvc\Controller,
+    Caylof\Mvc\View,
+    App\Models\UserModel;
 
 class IndexController extends Controller {
 
@@ -28,11 +29,20 @@ class IndexController extends Controller {
     }
 
     public function listUser($userId) {
+        $res = ['success' => false, 'msg' => '获取失败'];
+        try {
+            $um = new UserModel();
+            if ($user = $um->findUser($userId)) {
+                $res['success'] = true;
+                $res['msg'] = '获取成功';
+                $res['data'] = $user;
+            }
+        } catch(\Exception $e) {
+            $res['msg'] = $e->getMessage();
+        }
+
         //$this->response->type = 'json';
-        $this->response->content = json_encode([
-            'id' => $userId,
-            'name' => '中国人'
-        ], JSON_UNESCAPED_UNICODE);
+        $this->response->content = json_encode($res, JSON_UNESCAPED_UNICODE);
 
         return $this->response;
     }

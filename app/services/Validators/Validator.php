@@ -57,6 +57,21 @@ abstract class Validator {
     }
 
     /**
+     * 将公共属性作为数组
+     */
+    public function toArray() {
+        $refClass = new \ReflectionClass($this);
+        $props =  $refClass->getDefaultProperties();
+        $arr = [];
+        foreach ($props as $prop => $val) {
+            if ($refClass->getProperty($prop)->isPublic()) {
+                $arr[$prop] = $this->$prop;
+            }
+        }
+        return $arr;
+    }
+
+    /**
      * label读写方法
      * 若第一个参数为“键值对数组”，那么第二个参数应该为null，此时为“写多个label”
      * 若第一个参数为“标量”，且第二个参数为“string类型”，此时为“写一个label”

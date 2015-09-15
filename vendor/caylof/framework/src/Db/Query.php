@@ -1,5 +1,5 @@
 <?php
-namespace App\Db;
+namespace Caylof\Db;
 
 /**
  * 数据库CURD操作类
@@ -105,7 +105,7 @@ class Query {
      *
      * @param \Caylof\Db\DbBase $db 数据库连接
      */
-    public function __construct(\Caylof\Db\DbBase $db) {
+    public function __construct(DbBase $db) {
         $this->db = $db;
     }
 
@@ -274,9 +274,9 @@ class Query {
      * @return $this
      */
     public function where(array $where) {
-        $this->where = array_map(function ($v) {
+        $this->where = array_merge($this->where, array_map(function ($v) {
             return "$v=?";
-        }, array_keys($where));
+        }, array_keys($where)));
         $this->params = array_merge($this->params, array_values($where));
         return $this;
     }
@@ -336,6 +336,26 @@ class Query {
      */
     public function oneCol($col = 0) {
         return $this->type == 'select' ? $this->stmt->fetchColumn($col) : null;
+    }
+
+    public function lastInsertId () {
+        return $this->db->lastInsertId();
+    }
+
+    public function rowCount() {
+        return $this->stmt->rowCount();
+    }
+
+    public function beginTransaction() {
+        $this->db->beginTransaction();
+    }
+
+    public function commit() {
+        $this->db->commit();
+    }
+
+    public function rollBack() {
+        $this->db->rollBack();
     }
 
     /**

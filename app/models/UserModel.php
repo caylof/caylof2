@@ -1,19 +1,17 @@
 <?php
 namespace App\Models;
 
-use \Caylof\Mvc\Model;
+use Caylof\Mvc\Model;
 
 class UserModel extends Model {
 
-    protected $table = 'user';
+    public function findUser($userId) {
+        $user = $this->query->select()
+            ->table('user')
+            ->where(['id' => $userId])
+            ->run()
+            ->one();
 
-    protected $pk = 'id';
-
-    protected $autoIncrent = 'id';
-
-    protected $fieldsMapping = [
-        'id'   => 'id',
-        'name' => 'name',
-        'pass' => 'pwd'
-    ];
+        return $user;
+    }
 }
