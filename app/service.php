@@ -8,16 +8,16 @@
 |
 */
 
-$app = \Caylof\App::getInstance();
+$app = Caylof\App::getInstance();
 
 // 注入数据库操作类
 $app->set('db', function() {
-    return \Caylof\Db\DbFactory::make();
+    return Caylof\Db\DbFactory::make();
 });
 
 // 注入session类
 $app->set('session', function() {
-    return new \Caylof\Session\Session();
+    return new Caylof\Session\Session();
 });
 
 /*
@@ -29,8 +29,8 @@ $app->set('dbsess', function() use ($app) {
     $fields->id       = 'sess_id';
     $fields->data     = 'sess_data';
     $fields->lifeTime = 'sess_lifetime';
-    return new \Caylof\Session\SessionStrategy(
-        new \Caylof\Session\DbSessionHandler($db, $table, $fields)
+    return new Caylof\Session\SessionStrategy(
+        new Caylof\Session\DbSessionHandler($db, $table, $fields)
     );
 });
 */
